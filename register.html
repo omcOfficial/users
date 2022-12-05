@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMC REGISTER</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+        }
+
+        .container-custom {
+            max-width: 600px;
+            /* background-color: #; */
+        }
+
+        .edit {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar bg-primary">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1 text-light">REGISTER</span>
+            <!-- <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#table-fix-data">
+                <i class="bi bi-pen"></i>&nbsp;แก้ไขข้อมูล
+            </button> -->
+        </div>
+    </nav>
+    <div class="container container-custom mt-4">
+        <div class="row justify-content-center">
+            <img src="https://img.icons8.com/cotton/100/null/petition.png" style="max-width: 150px;" />
+        </div>
+        <div class="row justify-content-center g-3">
+            <div class="col-12">
+                <label for="name">ชื่อ</label>
+                <input type="text" class="form-control form-control-lg" id="name">
+            </div>
+            <div class="col-12">
+                <label for="phone">เบอร์โทรศัพท์</label>
+                <input type="text" class="form-control form-control-lg" id="phone">
+            </div>
+            <div class="col-12">
+                <label for="lineID">ไอดีไลน์</label>
+                <input type="text" class="form-control form-control-lg" id="lineID">
+            </div>
+            <div class="col-12">
+                <label for="refererName">ชื่อผู้นำสายงาน</label>
+                <input type="text" class="form-control form-control-lg" id="refererName">
+            </div>
+            <div class="col-12 edit">
+                <label for="refererid">Referer ID</label>
+                <input type="text" class="form-control form-control-lg" id="refererid" readonly>
+            </div>
+            <div class="col-12 edit">
+                <label for="userid">User ID</label>
+                <input type="text" class="form-control form-control-lg" id="userid" readonly>
+            </div>
+            <div class="col-12 edit">
+                <label for="level">Level</label>
+                <input type="text" class="form-control form-control-lg" id="level">
+            </div>
+            <div class="col-12 edit">
+                <label for="group">Group</label>
+                <input type="text" class="form-control form-control-lg" id="group">
+            </div>
+        </div>
+        <div class="row justify-content-center mt-3">
+            <div class="col-12 text-center">
+                <button type="button" class="btn btn-lg btn-warning w-50" id="submit"><i class="bi bi-send"></i>&nbsp;ลงทะเบียน</button>
+            </div>
+        </div>
+    </div>
+    <!-- <script src="https://unpkg.com/vconsole@latest/dist/vconsole.min.js"></script>
+    <script>
+        // VConsole will be exported to `window.VConsole` by default.
+        var vConsole = new window.VConsole();
+    </script> -->
+    <script>
+        const scripturl = 'https://script.google.com/macros/s/AKfycbx5tL6yo_5naErDX9B9H6d5iX4VL1wxcbzOEVpca-6vUE8FaEwp6HJYru_JhhAhRvH4/exec'
+        var isgetdata = false
+        $(document).ready(function () {
+            $.LoadingOverlay("show");
+            $('#phone').mask('000-000-0000')
+            liff.init({
+                liffId: '1657709044-AL47yxYX',
+                withLoginOnExternalBrowser: true
+            })
+            liff.ready.then(() => {
+                if (!liff.isLoggedIn()) {
+                    return liff.login()
+                }
+                $.LoadingOverlay("hide");
+                checkRegister()
+                // createTable(testobj);
+            });
+        });
+
+        function checkRegister() {
+            Swal.fire({
+                icon: 'info',
+                title: 'กรุณารอสักครู่',
+                text: 'กำลังตรวจสอบข้อมูล',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                allowEnterKey: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading(Swal.getConfirmButton())
+                }
+            })
+            let uid = liff.getDecodedIDToken().sub
+            $.ajax({
+                url: scripturl + '?opt=checkregist',
+                method: "POST",
+                dataType: "json",
+                data: {
+                    uid: uid
+                },
+                success: function (response) {
+                    console.log(response)
+                    if (response.status == 'success') {
+                        Swal.close()
+                        if (response.isRegist) {
+                            $('#name').val(response.isRegist.name)
+                            $('#phone').val(response.isRegist.phone)
+                            $('#lineID').val(response.isRegist.lineid)
+                            $('#refererName').val(response.isRegist.referername)
+                            $('#refererid').val(response.isRegist.refererid)
+                            $('#userid').val(response.isRegist.userid)
+                            $('#level').val(response.isRegist.level)
+                            $('#group').val(response.isRegist.group)
+                            $('.edit').show()
+                            $('#submit').text('แก้ไขข้อมูล').removeClass('btn-warning').addClass('btn-danger').attr('id', 'edit')
+                            $('.navbar-brand').text('EDIT DATA')
+                        }
+                    }
+                }
+            })
+        }
+
+        $('#submit, #edit').click(function () {
+            let id = $(this).attr('id')
+            let uid = liff.getDecodedIDToken().sub
+            let name = $('#name').val()
+            let phone = $('#phone').val().replace(/-/g, '')
+            console.log("🚀 ~ phone", phone)
+            let lineID = $('#lineID').val()
+            let refererName = $('#refererName').val()
+            if (name == '' || phone == '' || lineID == '' || refererName == '') {
+                return Swal.fire({
+                    icon: 'warning',
+                    title: 'กรุณากรอกข้อมูลให้ครบถ้วน',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            }
+            let data = {
+                opt: id == 'submit' ? 'register' : 'edit',
+                uid: uid,
+                name: name,
+                phone: phone,
+                lineid: lineID,
+                referername: refererName
+            }
+            if (id == 'edit') {
+                data.refererid = $('#refererid').val()
+                data.userid = $('#userid').val()
+                data.level = $('#level').val()
+                data.group = $('#group').val()
+            }
+            console.log("🚀 ~ data", data)
+            Swal.fire({
+                icon: 'info',
+                title: id == 'submit' ? 'กำลังบันทึกข้อมูล' : 'กำลังแก้ไขข้อมูล',
+                html: 'กรุณารอสักครู่...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading(Swal.getConfirmButton())
+                },
+            })
+            $.ajax({
+                url: scripturl,
+                method: "POST",
+                dataType: "json",
+                data: data,
+                success: function (response) {
+                    console.log("🚀 ~ response", response)
+                    if (response.status == 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonText: 'ตกลง',
+                            timer: 3000
+                        })
+                        let flexs = [
+                            {
+                                "type": "bubble",
+                                "header": {
+                                    "type": "box",
+                                    "layout": "horizontal",
+                                    "contents": [
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                                {
+                                                    "type": "image",
+                                                    "url": liff.getDecodedIDToken().picture,
+                                                    "size": "full",
+                                                    "aspectMode": "cover"
+                                                }
+                                            ],
+                                            "flex": 3,
+                                            "width": "80px",
+                                            "cornerRadius": "40px"
+                                        },
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                                {
+                                                    "type": "text",
+                                                    "text": "ยินดีต้อนรับ",
+                                                    "size": "lg",
+                                                    "weight": "bold"
+                                                },
+                                                {
+                                                    "type": "text",
+                                                    "text": name
+                                                }
+                                            ],
+                                            "flex": 7,
+                                            "justifyContent": "center",
+                                            "alignItems": "center"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "type": "bubble",
+                                "header": {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "contents": [
+                                        {
+                                            "type": "text",
+                                            "text": "⚠️⚠️แจ้งเตือน⚠️⚠️",
+                                            "weight": "bold",
+                                            "size": "xxl",
+                                            "adjustMode": "shrink-to-fit",
+                                            "align": "center",
+                                            "color": "#ffffff"
+                                        }
+                                    ]
+                                },
+                                "body": {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "contents": [
+                                        {
+                                            "type": "text",
+                                            "text": "ก่อนกดปุ่มขอรับ id แนะนำ ให้ดำเนินการ ดังนี้ ให้เรียบร้อยก่อน",
+                                            "wrap": true,
+                                            "align": "center"
+                                        },
+                                        {
+                                            "type": "separator"
+                                        },
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                                {
+                                                    "type": "text",
+                                                    "text": "1. ติดตั้งกระเป๋า Tronlink Pro หรือ Token Pocket ก่อน",
+                                                    "wrap": true
+                                                },
+                                                {
+                                                    "type": "text",
+                                                    "text": "2. โอนเหรียน TRX ไว้ในกระเป๋าอย่างน้อย 400 TRX",
+                                                    "wrap": true
+                                                },
+                                                {
+                                                    "type": "text",
+                                                    "text": "3. กดปุ่มขอรับ id แนะนำ",
+                                                    "wrap": true
+                                                }
+                                            ],
+                                            "spacing": "xl"
+                                        }
+                                    ],
+                                    "spacing": "xxl"
+                                },
+                                "styles": {
+                                    "header": {
+                                        "backgroundColor": "#ff0000"
+                                    }
+                                }
+                            },
+                        ].map((bubble, b) => {
+                            return {
+                                "type": "flex",
+                                "altText": "Welcome Message " + (b + 1),
+                                "contents": bubble
+                            }
+                        })
+                        if (id == 'edit') {
+                            flexs.pop()
+                            flexs[0].contents.header.contents[1].contents[0].text = 'แก้ไขข้อมูลสำเร็จ'
+                        } else {
+                            flexs.unshift({
+                                "type": "text",
+                                "text": "#welcome#"
+                            })
+                        }
+
+                        liff.sendMessages(flexs).then(function () {
+                            liff.closeWindow()
+                        })
+                        $('input').val('')
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'ลงทะเบียนไม่สำเร็จ',
+                            confirmButtonText: 'ตกลง',
+                            timer: 3000
+                        })
+                    }
+                }
+            });
+        })
+
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/qr-scanner@1.4.1/qr-scanner.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js" integrity="sha512-pHVGpX7F/27yZ0ISY+VVjyULApbDlD0/X0rgGbTqCE7WFW5MezNTWG/dnhtbBuICzsd0WQPgpE4REBLv+UqChw==" crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
+</body>
+
+</html>
