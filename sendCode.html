@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMC Send Code</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+        }
+
+        .container-custom {
+            max-width: 600px;
+            /* background-color: #; */
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar bg-primary">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1 text-light">Send Code</span>
+            <!-- <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#table-fix-data">
+                <i class="bi bi-pen"></i>&nbsp;แก้ไขข้อมูล
+            </button> -->
+        </div>
+    </nav>
+    <div class="container container-custom mt-4">
+        <div class="row justify-content-center">
+            <img src="https://img.icons8.com/cotton/100/null/petition.png" style="max-width: 150px;" />
+        </div>
+        <div class="row justify-content-center g-3">
+            <div class="col-12">
+                <label for="userid">User ID</label>
+                <input type="text" class="form-control form-control-lg" id="userid">
+            </div>
+            <div class="col-12">
+                <label for="file">อัพโหลดหลักฐาน</label>
+                <input type="file" class="form-control form-control-lg" id="file" accept="image/*">
+            </div>
+        </div>
+        <div class="row justify-content-center mt-3">
+            <div class="col-12 text-center">
+                <button type="button" class="btn btn-lg btn-warning w-50" id="submit"><i class="bi bi-send"></i>&nbsp;ส่งข้อมูล</button>
+            </div>
+        </div>
+        <div class="row mt-3" style="display: none;">
+            <img alt="preview" id="preview" class="img-fluid">
+        </div>
+    </div>
+    <!-- <script src="https://unpkg.com/vconsole@latest/dist/vconsole.min.js"></script>
+    <script>
+        // VConsole will be exported to `window.VConsole` by default.
+        var vConsole = new window.VConsole();
+    </script> -->
+    <script>
+        const scripturl = 'https://script.google.com/macros/s/AKfycbx5tL6yo_5naErDX9B9H6d5iX4VL1wxcbzOEVpca-6vUE8FaEwp6HJYru_JhhAhRvH4/exec'
+        var isgetdata = false
+        $(document).ready(function () {
+            // checkRegister()
+            $.LoadingOverlay("show");
+            liff.init({
+                liffId: '1657709044-VMkOb89G',
+                withLoginOnExternalBrowser: true
+            })
+            liff.ready.then(() => {
+                if (!liff.isLoggedIn()) {
+                    return liff.login()
+                }
+                $.LoadingOverlay("hide");
+                checkRegister()
+                // createTable(testobj);
+            });
+        });
+        let file
+        $('#file').change(function () {
+            var f = this.files[0];
+            var reader = new FileReader();
+            reader.onloadend = function (e) {
+                $('#preview').attr('src', e.target.result).parent().show()
+                file = {}
+                file.data = e.target.result
+                file.name = f.name
+            }
+            if (f) {
+                reader.readAsDataURL(f);
+            } else {
+                $('#preview').attr('src', "").parent().hide()
+            }
+        });
+
+        function checkRegister() {
+            Swal.fire({
+                icon: 'info',
+                title: 'กรุณารอสักครู่',
+                text: 'กำลังตรวจสอบข้อมูล',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                allowEnterKey: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading(Swal.getConfirmButton())
+                }
+            })
+            let uid = liff.getDecodedIDToken().sub
+            $.ajax({
+                url: scripturl + '?opt=checkregist_sendcode',
+                method: "POST",
+                dataType: "json",
+                data: {
+                    uid: uid
+                },
+                success: function (response) {
+                    console.log(response)
+                    if (response.status == 'success') {
+                        Swal.close()
+                        $('#name').val(response.isRegist.name)
+                        $('#phone').val(response.isRegist.phone)
+                        $('#lineID').val(response.isRegist.lineid)
+                        $('#refererName').val(response.isRegist.referername)
+                        $('#submit').text('แก้ไขข้อมูล').removeClass('btn-warning').addClass('btn-danger').attr('id', 'edit')
+                        $('.navbar-brand').text('EDIT DATA')
+                    } else {
+                        if (response.message == 'not_regist') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'คุณยังไม่ได้ลงทะเบียน',
+                                text: 'กรุณาลงทะเบียนก่อน',
+                                confirmButtonText: 'ตกลง',
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                allowEnterKey: false,
+                            }).then((result) => {
+                                liff.closeWindow()
+                            })
+                        } else if (response.message == 'no_refererID') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'ยังไม่ได้ขอรับรหัส Referer ID',
+                                text: 'กรุณาขอรับรหัส Referer ID ก่อน',
+                                confirmButtonText: 'ตกลง',
+                                allowOutsideClick: false,
+                            }).then((result) => {
+                                liff.closeWindow()
+                            })
+                        } else if (response.message == 'already_regist') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'คุณได้ส่งโค้ดมาแล้ว',
+                                text: 'โค้ดของคุณได้ถูกบันทึกในระบบแล้ว',
+                                confirmButtonText: 'ตกลง',
+                                allowOutsideClick: false,
+                            }).then((result) => {
+                                liff.closeWindow()
+                            })
+                        }
+                    }
+                }
+            })
+        }
+
+        $('#submit').click(function () {
+            let uid = liff.getDecodedIDToken().sub
+            let userid = $('#userid').val()
+            let lineID = $('#lineID').val()
+            if (userid == '') {
+                return Swal.fire({
+                    icon: 'warning',
+                    title: 'กรุณากรอกข้อมูลให้ครบถ้วน',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            }
+            if (!file) {
+                return Swal.fire({
+                    icon: 'warning',
+                    title: 'กรุณาอัพโหลดหลักฐาน',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            }
+            let data = {
+                opt: 'sendcode',
+                uid: uid,
+                userid: userid,
+            }
+            if (file) {
+                data.file = JSON.stringify(file)
+            }
+            console.log("🚀 ~ data", data)
+            Swal.fire({
+                icon: 'info',
+                title: 'กำลังส่งข้อมูล',
+                html: 'กรุณารอสักครู่...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading(Swal.getConfirmButton())
+                },
+            })
+            $.ajax({
+                url: scripturl,
+                method: "POST",
+                dataType: "json",
+                data: data,
+                success: function (response) {
+                    console.log("🚀 ~ response", response)
+                    if (response.status == 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonText: 'ตกลง',
+                            timer: 3000
+                        })
+                        let flex = {
+                            type: 'flex',
+                            altText: 'ยืนยันการลงทะเบียน',
+                            contents: {
+                                "type": "bubble",
+                                "header": {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "contents": [
+                                        {
+                                            "type": "text",
+                                            "text": "ส่งข้อมูลให้ผู้ดูแลตรวจสอบแล้ว",
+                                            "weight": "bold",
+                                            "adjustMode": "shrink-to-fit",
+                                            "align": "center"
+                                        }
+                                    ]
+                                },
+                                "hero": {
+                                    "type": "image",
+                                    "url": response.url,
+                                    "size": "full",
+                                    "aspectMode": "fit",
+                                    "action": {
+                                        "type": "uri",
+                                        "uri": response.url
+                                    }
+                                },
+                                "body": {
+                                    "type": "box",
+                                    "layout": "horizontal",
+                                    "contents": [
+                                        {
+                                            "type": "text",
+                                            "text": "User ID:",
+                                            "flex": 3,
+                                            "size": "lg",
+                                            "weight": "bold"
+                                        },
+                                        {
+                                            "type": "text",
+                                            "text": userid,
+                                            "flex": 7,
+                                            "size": "lg",
+                                            "weight": "bold",
+                                            "color": "#0069d9"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                        liff.sendMessages([flex]).then(function () {
+                            liff.closeWindow()
+                        }).catch((err) => {
+                            console.log("error", err);
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: response.message,
+                            confirmButtonText: 'ตกลง',
+                            timer: 3000
+                        })
+                    }
+                }
+            });
+        })
+
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/qr-scanner@1.4.1/qr-scanner.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js" integrity="sha512-pHVGpX7F/27yZ0ISY+VVjyULApbDlD0/X0rgGbTqCE7WFW5MezNTWG/dnhtbBuICzsd0WQPgpE4REBLv+UqChw==" crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
+</body>
+
+</html>
